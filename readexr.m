@@ -1,17 +1,69 @@
 %2017-10-12
-filename=('E:\term1\EECE541\CIELAB downsampling Team\Market3Clip4000r2_1920x1080p_50_hf_709_ct2020_444_00000.exr');
+clc
+clear all
+close all
+%% Get user
+userlist = ["Sukey","Yuki","Ahmed","Maurizio"];
+for ii=1:length(userlist)
+    disp([string(ii) + '   ' + userlist(ii)])
+end
+user = input('Who are you?  ');
+%%
+%% Set your CD here
+dirlist = ["E:\term1\EECE541\CIELAB downsampling Team\MATLAB",...
+    " ", ...    % Yuki: enter your directory here
+    " ", ...    % Ahmed: enter your directory here
+    "C:\Users\mvonf\Documents\SCHOOL\UBC_Grad\UBC_Fall2017\EECE541\CIELAB_downsampling_Team\MATLAB\"];
+cd([dirlist{user}]);
+
+% add all folders that contain Matlab code
+addpath('ProvidedCode')
+addpath('trunk')
+addpath('ProvidedCode\openEXR')
+addpath('ProvidedCode\Display')
+  
+
+%%
+filename=('Market3Clip4000r2_1920x1080p_50_hf_709_ct2020_444_00000.exr');
 img=exrread(filename);
 rgb = tonemap(img);
-figure(1)
-subplot(2,2,1)
+
+% SHOULDN'T THIS BE rgb FOR THE INPUT??????
+rgbPQ = SMPTE_ST_2084(img, true, 10000);    % this function works for inverse too, just set TRUE to FALSE
+
+%% YCbCr
+YCbCr = RGB2YCbCr(rgbPQ, true, 'BT.2020', true);
+[ChromaA, ChromaB] = ChromaDownSampling(YCbCr, '420');
+
+%% Lab
+labimg=rgb2Lab(rgbPQ);
+
+%% plot
+figure
 imshow(rgb);
 title('exr ')
-y = SMPTE_ST_2084(img, true, 10000);
-size(y);
-subplot(2,2,2)
-imshow(y)
+figure
+imshow(rgbPQ)
 title('after PQ ')
-labimg=rgb2Lab(y);
-subplot(2,2,3)
+figure
 imshow(labimg)
-title('2Lab ')
+title('CIELAB')
+figure
+imshow(YCbCr)
+title('YCbCr')
+
+%% extract L, a, and b channels
+L = labimg(:,:,1);
+A = labimg(:,:,2);
+B = labimg(:,:,3);
+
+figure
+subplot(311)
+imshow(L)
+title('L')
+subplot(312)
+imshow(A)
+title('A')
+subplot(313)
+imshow(B)
+title('B')

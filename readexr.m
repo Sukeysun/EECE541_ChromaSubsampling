@@ -11,7 +11,7 @@ user = input('Who are you?  ');
 %%
 %% Set your CD here
 dirlist = [string('E:\term1\EECE541\CIELAB downsampling Team\MATLAB'),...
-    string(' '), ...    % Yuki: enter your directory here
+    string('/Users/rangke/Documents/workspace/CIELAB downsampling Team/MATLAB'), ...    
     string(' '), ...    % Ahmed: enter your directory here
     string('C:\Users\mvonf\Documents\SCHOOL\UBC_Grad\UBC_Fall2017\EECE541\CIELAB_downsampling_Team\MATLAB\')];
 cd([dirlist{user}]);

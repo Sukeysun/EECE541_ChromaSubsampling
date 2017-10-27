@@ -5,6 +5,7 @@ function labimg= rgb2Lab(rgbimg)
 R=rgbimg(:,:,1);
 G=rgbimg(:,:,2);
 B=rgbimg(:,:,3);
+% quantize R, G, and B values to range of [0,1] if needed 
 if ((max(max(R))> 1.0)|(max(max(G))> 1.0)|(max(max(B))> 1.0))  % max value in all features
 %if (max(R)> 1.0)| (max(G)> 1.0)|(max(B)>1.0) % different max values in different columns
 R = R/255;

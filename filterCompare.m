@@ -38,12 +38,23 @@ H1 = [1 0 -1; 2 0 -2; 1 0 -1];
 H1 = [1 6 1];
 
 %bilinear?
-H1 = 1/4*[0 1 0; 1 0 1; 0 1 0];
+% H1 = 1/4*[0 1 0; 1 0 1; 0 1 0];
+
+% CfE
+% W1 = [1 6 1];  %horizontal
+% H1 = [0 4 4]'; %vertical
 
 filteredtestim2 = imfilter(testimage, H1, 'replicate') ;
-filteredtestim = imfilter(testimage, H1,'conv') ;
-Yfilt = imfilter(Y, H1,'conv');
+filteredtestim = imfilter(testimage, H1,'replicate') ;
+Yfilt = imfilter(Y, W1,'replicate');
+Yfilt = imfilter(Yfilt,H1,'replicate');
 % Yfilt = Yfilt/max(max(Yfilt));
+
+%% scale like they do in ChromaDownSampling.m
+offset   = 32;
+shift    = 6;
+Yfilt  = (Yfilt + offset) / 2^shift;
+
 
 %% is bilinear done this way the same as if using imresize? Lets check...
 Yresized = imresize(Y,0.5,'bilinear'); % use resize to subsample and filter at the same time
@@ -70,7 +81,7 @@ imshow(Y)
 title('Original')
 figure
 imshow(Yfilt)
-title(['Filtered with [' num2str(H1) ']'])
+title(['Filtered'])
 
 
 

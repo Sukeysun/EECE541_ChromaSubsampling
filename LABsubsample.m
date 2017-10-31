@@ -15,6 +15,7 @@
 %   - Inverse everything, back to .exr
 %
 % Created: 24 October 2017
+% last updated: 31 Oct 2017
 
 clc
 clear all
@@ -34,8 +35,13 @@ rgbPQ = SMPTE_ST_2084(img, true, 10000);
 labimg=rgb2Lab(rgbPQ);
 % labimg=rgb2lab(rgbPQ);
 
+YCbCr = rgb2ycbcr(rgbPQ);
+
 %% quantize lab into 0:1024
 labq = ScaleImage2BitDepthLAB(labimg, true, false, 10, 'Lab');
+labq = uint32(labq);
+YCbCrq = ScaleImage2BitDepthLAB(YCbCr, true, false, 10, 'YCbCr');
+YCbCrq = uint32(YCbCrq);
 
 %% extract L, a, and b channels
 L = labq(:,:,1);
@@ -43,17 +49,24 @@ A = labq(:,:,2);
 B = labq(:,:,3);
 
 %% apply chroma downsampling
-filter = 'MPEGCfE';
+filter = 'lanczos3';
 [Asampled, Bsampled] = ChromaDownSampling(labq,'420',filter); 
-%% apply chroma upsampling
-labimgcompressed = ChromaUpSampling(L, Asampled, Bsampled); 
+[Cbsampled, Crsampled] = ChromaDownSampling(YCbCrq,'420',filter); 
 
-%% save file in planar form
-filename = ['Lab' filter '.yuv']; 
-WriteFramePlanar(labimgcompressed(:,:,1), labimgcompressed(:,:,2), labimgcompressed(:,:,3), filename, 3,10);
+%% save 4:2:0 file in planar form
+filename = ['Lab420' filter '.yuv']; 
+WriteFramePlanar(L, Asampled, Bsampled, filename, 3,10);
+
+filename2 = ['YCbCr420' filter '.yuv']; 
+WriteFramePlanar(YCbCrq(:,:,1), Cbsampled, Crsampled, filename2, 3,10);
+
+%% apply chroma upsampling
+labimgcompressed = ChromaUpSampling(L, Asampled, Bsampled, '420',filter); 
+ycbcrimgcompressed = ChromaUpSampling(YCbCr(:,:,1), Cbsampled, Crsampled, '420',filter);
 
 %% convert back to r'g'b'
 rgbPQcompressed = lab2rgb(labimgcompressed);
+
 %% convert back to rgb
 exr = SMPTE_ST_2084(rgbPQcompressed, false, 10000);
 
@@ -71,10 +84,3 @@ imgReopen=exrread('test.exr');
 rgbPQReopen = SMPTE_ST_2084(img, true, 10000);
 figure
 imshow(rgbPQReopen)
-
-
-
-
-
-
-

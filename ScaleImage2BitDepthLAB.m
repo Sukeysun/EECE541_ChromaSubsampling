@@ -124,7 +124,7 @@ elseif strcmp(Representation,'RGB')
 elseif strcmp(Representation,'Lab')
     % Lab: scale linearly
     ImgOut(:,:,1) = ImgIn(:,:,1)/100*2^BitDepth;    % L [0, 100]
-    ImgOut(:,:,2) = (ImgIn(:,:,2) + 86.185)/184.439*2^BitDepth; % a [-86.185, 98,254]
+    ImgOut(:,:,2) = (ImgIn(:,:,2) + 86.185)/184.439*2^BitDepth; % a [-86.185, 98.254]
     ImgOut(:,:,3) = (ImgIn(:,:,3) + 107.863)/202.345*2^BitDepth; % b [-107.863, 94.482]
         
         

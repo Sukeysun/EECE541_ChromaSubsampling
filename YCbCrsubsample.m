@@ -11,6 +11,10 @@ filename=('Market3Clip4000r2_1920x1080p_50_hf_709_ct2020_444_00000.exr');
 img=exrread(filename);
 %% apply PQ
 rgbPQ = SMPTE_ST_2084(img, true, 10000);
+figure
+imshow(rgbPQ)
+title('Original, Perceptually Quantized Image')
+
 %% convert to YCbCr
 YCbCr = RGB2YCbCr(rgbPQ,true,'BT.2020',false);
 %% quantize to 10 bits
@@ -37,3 +41,22 @@ exrcompressed = SMPTE_ST_2084(rgbPQcompressed, false, 10000);
 %% see image
 figure
 imshow(rgbPQcompressed);
+title('Compressed RGB (compressed in YCbCr), before inverse PQ')
+% 
+% figure
+% imshow(rgbPQ-rgbPQcompressed)
+% figure
+% mesh(rgbPQ(:,:,1)-rgbPQcompressed(:,:,1))
+
+
+% remove imaginary pixels
+numcomplex = size(find(imag(exrcompressed)~=0)); % these are caused by rgbPQcompressed values<0
+disp('Number of imaginary pixel values in .exr file:')
+disp(numcomplex)
+exrcompressed(imag(exrcompressed) ~= 0) = 0; % eliminate imaginary pixels
+
+%% save file
+filename3 = ['YCbCr420' filter '.exr']; 
+% exrwrite(exrcompressed, filename3);
+exrwritechannels(filename3, 'none', 'half', {'R', 'G', 'B'}, {exrcompressed(:,:,1),exrcompressed(:,:,2),exrcompressed(:,:,3)});
+

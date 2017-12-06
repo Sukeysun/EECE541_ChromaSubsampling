@@ -25,6 +25,8 @@ close all
 setdir(4); 
 
 %% import file
+
+% filename=([cd '\VideoFrames\Market3Clip4000r2_1920x1080p_50_hf_709_ct2020_444\Market3Clip4000r2_1920x1080p_50_hf_709_ct2020_444_00001.exr']);
 filename=('Market3Clip4000r2_1920x1080p_50_hf_709_ct2020_444_00000.exr');
 img=exrread(filename);
 % imgsweatshirt = img(520:610,35:145,:);
@@ -44,7 +46,7 @@ labq = QuantizeBT1361(labimg, true, 10, 'YCbCr');
 labq = uint16(labq);
 
 %% apply chroma downsampling
-filter = 'MPEGMvF07';
+filter = 'MPEGSuperAnchor';
 [Asampled, Bsampled] = ChromaDownSampling(labq,'420',filter); 
 
 %% save 4:2:0 file in planar form
@@ -112,13 +114,13 @@ exrcompressed(imag(exrcompressed) ~= 0) = 0; % eliminate imaginary pixels
 %% save files
 wd = cd;
 cd([cd '\EXRs']);
-filename3 = ['CIELAB420' filter 'Sweatshirt.exr'];
+filename3 = ['CIELAB444' filter 'Sweatshirt.exr'];
 exrwritechannels(filename3, 'none', 'half', {'R', 'G', 'B'}, {exrsweatshirt(:,:,1),exrsweatshirt(:,:,2),exrsweatshirt(:,:,3)});
 
-filename4 = ['CIELAB420' filter 'Pricetag.exr'];
+filename4 = ['CIELAB444' filter 'Pricetag.exr'];
 exrwritechannels(filename4, 'none', 'half', {'R', 'G', 'B'}, {exrpricetag(:,:,1),exrpricetag(:,:,2),exrpricetag(:,:,3)});
 
-filename5 = ['CIELAB420' filter '.exr'];
+filename5 = ['CIELAB444' filter '.exr'];
 exrwritechannels(filename5, 'none', 'half', {'R', 'G', 'B'}, {exrcompressed(:,:,1),exrcompressed(:,:,2),exrcompressed(:,:,3)});
 cd(wd);
 %% open file to display
